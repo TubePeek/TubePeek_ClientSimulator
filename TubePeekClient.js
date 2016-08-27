@@ -28,6 +28,16 @@ if(socket) {
     });
 }
 
+var vidUrlsToChooseFrom = [
+    "https://www.youtube.com/watch?v=YmSVji6uzzw",
+    "https://www.youtube.com/watch?v=RozWiUA-GCk",
+    "https://www.youtube.com/watch?v=r5TJYhZeZs8",
+    "https://www.youtube.com/watch?v=NOfKyjyWiU0",
+    "https://www.youtube.com/watch?v=EB4MYGInRl4",
+    "https://www.youtube.com/watch?v=YpEFYDkpXE0&t=1440s",
+    "https://www.youtube.com/watch?v=fklep3sUSWo"
+];
+
 function actOnServerMessage(messageData) {
     var action = messageData.action || "";
 
@@ -37,19 +47,43 @@ function actOnServerMessage(messageData) {
             "action" : "takeMySocialIdentity",
             "provider" : "google",
             "authData" : {
-                "uid" : "105780673981511269670",
-                "fullName":"Efe Ariaroo Dummy",
-                "emailAddress":"efeariaroo1@gmail.com",
-                "accessToken":"ya29.CjRAA_K_QBoNBpJprCT35XSY",
+                "uid" : "107870964512523715119",
+                "fullName":"Joseph Benson - Aruna",
+                "emailAddress":"joebaruna@gmail.com",
+                "accessToken":"ya29.Ci86A8ZpHsYljVRT80N4KmAK1fVXiYdZnkwKBEyZOVJxTPWAQ-deuHJL6fgsVaY6yA",
                 "accessTokenExpiry":"3600",
-                "imageUrl":"https://lh3.googleusercontent.com/-rVWQOfwty1I/AAAAAAAAAAI/AAAAAAAAAbQ/nLLEBefPIKo/photo.jpg?sz=50"
+                "imageUrl":"https://lh3.googleusercontent.com/-2QdI3W5d41Y/AAAAAAAAAAI/AAAAAAAADUQ/q96HDWYFHCs/photo.jpg?sz=50"
             },
-            friends : {}
-        }
+            friends : {
+                "105780673981511269670" : {
+                    fullName : "Efe Ariaroo",
+                    imageUrl : ""
+                }
+            }
+        };
         if(socket && socket.connected) {
             socket.emit('send', dataToSendToServer);
+            sendVideoChange(socket);
         }
     } else {
 
+    }
+}
+
+function sendVideoChange (socket) {
+    if(socket && socket.connected) {
+        (function myLoop (i) {
+            setTimeout(function () {
+                var dataToSendToServer = {
+                    action : PossibleActions.changedVideo,
+                    userEmail : "joebaruna@gmail.com",
+                    videoUrl : vidUrlsToChooseFrom[i]
+                };
+                console.log("Data sent to the server: \n" + JSON.stringify(dataToSendToServer));
+                socket.emit('send', dataToSendToServer);
+
+                if (--i) myLoop(i);      //  decrement i and call myLoop again if i > 0
+            }, 5000);
+        })(vidUrlsToChooseFrom.length);
     }
 }
