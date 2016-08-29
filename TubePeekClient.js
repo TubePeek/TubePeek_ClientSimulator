@@ -82,8 +82,20 @@ function sendVideoChange (socket) {
                 console.log("Data sent to the server: \n" + JSON.stringify(dataToSendToServer));
                 socket.emit('send', dataToSendToServer);
 
-                if (--i) myLoop(i);      //  decrement i and call myLoop again if i > 0
+                if (i >= 0)
+                    myLoop(--i);
+                else
+                    goOffline(socket);
             }, 5000);
         })(vidUrlsToChooseFrom.length);
     }
+}
+
+function goOffline (socket) {
+    var dataToSendToServer = {
+        action : PossibleActions.userChangedOnlineStatus,
+        userEmail : "joebaruna@gmail.com",
+        onlineState : false
+    };
+    socket.emit('send', dataToSendToServer);
 }
