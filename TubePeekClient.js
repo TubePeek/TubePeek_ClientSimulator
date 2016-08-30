@@ -82,7 +82,7 @@ function actOnServerMessage(messageData) {
         console.log("Will identity myself");
         for (var i = 0; i < usersToPlayWith.length; i++) {
             var dataToSendToServer = {
-                "action" : "takeMySocialIdentity",
+                "action" : PossibleActions.takeMySocialIdentity,
                 "provider" : "google",
                 "authData" : usersToPlayWith[i].authData,
                 friends : usersToPlayWith[i].friends
