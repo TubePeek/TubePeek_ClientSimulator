@@ -3,6 +3,7 @@ var io = require("socket.io-client");
 var ServerBaseUrl = "http://localhost:3700/";
 var socket = io.connect(ServerBaseUrl);
 
+
 var PossibleActions = {
     pleaseIdentifyYourself : 'pleaseIdentifyYourself',      // The server will send this to the client
     takeMySocialIdentity : 'takeMySocialIdentity',          // The client first sends this to the server
@@ -28,6 +29,42 @@ if(socket) {
     });
 }
 
+// Here you can use the details of your own friends
+var usersToPlayWith = [
+    {
+        authData : {
+            "uid" : "107870964512523715119",
+            "fullName":"Joseph Benson - Aruna",
+            "emailAddress":"joebaruna@gmail.com",
+            "accessToken":"ya29.Ci86A8ZpHsYljVRT80N4KmAK1fVXiYdZnkwKBEyZOVJxTPWAQ-deuHJL6fgsVaY6yA",
+            "accessTokenExpiry":"3600",
+            "imageUrl":"https://lh3.googleusercontent.com/-2QdI3W5d41Y/AAAAAAAAAAI/AAAAAAAADUQ/q96HDWYFHCs/photo.jpg?sz=50"
+        },
+        friends: {
+            "105780673981511269670" : {
+                fullName : "Efe Ariaroo",
+                imageUrl : ""
+            }
+        }
+    },
+    {
+        authData : {
+            "uid" : "106300473125144387782",
+            "fullName":"Akinwale Ifaniyi",
+            "emailAddress":"waleifaniyi@gmail.com",
+            "accessToken":"ya29.CjQwAyEowKwsyNofRVr5E6e7FKj8vaJWF_ybehe4Zvuz3Oc7W5DLeR09HItu-2N2y49rBcx0",
+            "accessTokenExpiry":"3600",
+            "imageUrl":"https://lh5.googleusercontent.com/-49Hchfm-Ti8/AAAAAAAAAAI/AAAAAAAAAU4/H3XoEbmtQXw/photo.jpg?sz=50"
+        },
+        friends: {
+            "105780673981511269670" : {
+                fullName : "Efe Ariaroo",
+                imageUrl : ""
+            }
+        }
+    }
+];
+
 var vidUrlsToChooseFrom = [
     "https://www.youtube.com/watch?v=YmSVji6uzzw",
     "https://www.youtube.com/watch?v=RozWiUA-GCk",
@@ -43,28 +80,18 @@ function actOnServerMessage(messageData) {
 
     if(action === PossibleActions.pleaseIdentifyYourself) {
         console.log("Will identity myself");
-        var dataToSendToServer = {
-            "action" : "takeMySocialIdentity",
-            "provider" : "google",
-            "authData" : {
-                "uid" : "107870964512523715119",
-                "fullName":"Joseph Benson - Aruna",
-                "emailAddress":"joebaruna@gmail.com",
-                "accessToken":"ya29.Ci86A8ZpHsYljVRT80N4KmAK1fVXiYdZnkwKBEyZOVJxTPWAQ-deuHJL6fgsVaY6yA",
-                "accessTokenExpiry":"3600",
-                "imageUrl":"https://lh3.googleusercontent.com/-2QdI3W5d41Y/AAAAAAAAAAI/AAAAAAAADUQ/q96HDWYFHCs/photo.jpg?sz=50"
-            },
-            friends : {
-                "105780673981511269670" : {
-                    fullName : "Efe Ariaroo",
-                    imageUrl : ""
-                }
+        for (var i = 0; i < usersToPlayWith.length; i++) {
+            var dataToSendToServer = {
+                "action" : "takeMySocialIdentity",
+                "provider" : "google",
+                "authData" : usersToPlayWith[i].authData,
+                friends : usersToPlayWith[i].friends
+            };
+            if(socket && socket.connected) {
+                socket.emit('send', dataToSendToServer);
             }
-        };
-        if(socket && socket.connected) {
-            socket.emit('send', dataToSendToServer);
-            sendVideoChange(socket);
         }
+        sendVideoChange(socket);
     } else {
 
     }
@@ -72,30 +99,34 @@ function actOnServerMessage(messageData) {
 
 function sendVideoChange (socket) {
     if(socket && socket.connected) {
-        (function myLoop (i) {
+        (function myLoop (indexOfVideo) {
             setTimeout(function () {
-                var dataToSendToServer = {
-                    action : PossibleActions.changedVideo,
-                    userEmail : "joebaruna@gmail.com",
-                    videoUrl : vidUrlsToChooseFrom[i]
-                };
-                console.log("Data sent to the server: \n" + JSON.stringify(dataToSendToServer));
-                socket.emit('send', dataToSendToServer);
+                if (indexOfVideo >= 0) {
+                    var userIndex = Math.floor(Math.random() * usersToPlayWith.length);
 
-                if (i >= 0)
-                    myLoop(--i);
-                else
+                    var dataToSendToServer = {
+                        action : PossibleActions.changedVideo,
+                        userEmail : usersToPlayWith[userIndex].authData.emailAddress,
+                        videoUrl : vidUrlsToChooseFrom[indexOfVideo]
+                    };
+                    console.log("Data sent to the server: \n" + JSON.stringify(dataToSendToServer));
+                    socket.emit('send', dataToSendToServer);
+
+                    myLoop(--indexOfVideo);
+                } else
                     goOffline(socket);
             }, 5000);
-        })(vidUrlsToChooseFrom.length);
+        })(vidUrlsToChooseFrom.length - 1);
     }
 }
 
 function goOffline (socket) {
-    var dataToSendToServer = {
-        action : PossibleActions.userChangedOnlineStatus,
-        userEmail : "joebaruna@gmail.com",
-        onlineState : false
-    };
-    socket.emit('send', dataToSendToServer);
+    for (var i = 0; i < usersToPlayWith.length; ++i) {
+        var dataToSendToServer = {
+            action : PossibleActions.userChangedOnlineStatus,
+            userEmail : usersToPlayWith[i].authData.emailAddress,
+            onlineState : false
+        };
+        socket.emit('send', dataToSendToServer);
+    }
 }
