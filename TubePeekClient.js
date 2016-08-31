@@ -20,7 +20,7 @@ var PossibleActions = {
 
 if(socket) {
     socket.on('message', function (data) {
-        console.log("Data gotten: " + JSON.stringify(data));
+        console.log("\nData gotten: " + JSON.stringify(data));
         actOnServerMessage(data);
     });
 
@@ -111,7 +111,7 @@ function sendVideoChange (socket) {
                         googleUserId : usersToPlayWith[userIndex].authData.uid,
                         videoUrl : vidUrlsToChooseFrom[indexOfVideo]
                     };
-                    //console.log("Data sent to the server: \n" + JSON.stringify(dataToSendToServer));
+                    console.log("\nData sent to the server: \n" + JSON.stringify(dataToSendToServer));
                     socket.emit('send', dataToSendToServer);
 
                     myLoop(--indexOfVideo);
