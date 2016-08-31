@@ -92,6 +92,8 @@ function actOnServerMessage(messageData) {
             }
         }
         sendVideoChange(socket);
+    } else if (action === PossibleActions.takeFriendOnlineStatus) {
+        console.log("Got takeFriendOnlineStatus! " + JSON.stringify(messageData));
     } else {
 
     }
@@ -106,10 +108,10 @@ function sendVideoChange (socket) {
 
                     var dataToSendToServer = {
                         action : PossibleActions.changedVideo,
-                        userEmail : usersToPlayWith[userIndex].authData.emailAddress,
+                        googleUserId : usersToPlayWith[userIndex].authData.uid,
                         videoUrl : vidUrlsToChooseFrom[indexOfVideo]
                     };
-                    console.log("Data sent to the server: \n" + JSON.stringify(dataToSendToServer));
+                    //console.log("Data sent to the server: \n" + JSON.stringify(dataToSendToServer));
                     socket.emit('send', dataToSendToServer);
 
                     myLoop(--indexOfVideo);
