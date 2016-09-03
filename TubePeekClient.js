@@ -22,13 +22,18 @@ var PossibleActions = {
     acknowledge : "acknowledge"
 };
 
+var isSocketConnected = false;
+
 socket.on('message', function (data) {
     console.log("\nData gotten: " + JSON.stringify(data));
+    isSocketConnected = true;
+
     actOnServerMessage(data);
 });
 
 socket.on('disconnect', function() {
     console.log("Socket.io Connection with server lost!");
+    isSocketConnected = false;
 });
 
 // Here you can use the details of your own friends
@@ -128,7 +133,10 @@ function sendVideoChange (socket) {
                 console.log("\nData sent to the server: \n" + JSON.stringify(dataToSendToServer) + "\n");
                 socket.emit('send', dataToSendToServer);
 
-                myLoop(--indexOfVideo);
+                if(isSocketConnected)
+                    myLoop(--indexOfVideo);
+                else
+                    console.log("Socket to server is disconnected!");
             } //else
                 //goOffline(socket);
         }, 5000);
