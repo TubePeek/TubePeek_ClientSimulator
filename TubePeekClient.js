@@ -1,6 +1,7 @@
 var io = require("socket.io-client");
 
 var ServerBaseUrl = "http://localhost:3700/";
+//var ServerBaseUrl = "http://ec2-52-58-212-143.eu-central-1.compute.amazonaws.com/";
 var socket = io.connect(ServerBaseUrl);
 
 
@@ -116,26 +117,24 @@ function takeVideosBeingWatched(messageData) {
 }
 
 function sendVideoChange (socket) {
-    if(socket && socket.connected) {
-        (function myLoop (indexOfVideo) {
-            setTimeout(function () {
-                if (indexOfVideo >= 0) {
-                    var userIndex = Math.floor(Math.random() * usersToPlayWith.length);
+    (function myLoop (indexOfVideo) {
+        setTimeout(function () {
+            if (indexOfVideo >= 0) {
+                var userIndex = Math.floor(Math.random() * usersToPlayWith.length);
 
-                    var dataToSendToServer = {
-                        action : PossibleActions.changedVideo,
-                        googleUserId : usersToPlayWith[userIndex].authData.uid,
-                        videoUrl : vidUrlsToChooseFrom[indexOfVideo]
-                    };
-                    console.log("\nData sent to the server: \n" + JSON.stringify(dataToSendToServer) + "\n");
-                    socket.emit('send', dataToSendToServer);
+                var dataToSendToServer = {
+                    action : PossibleActions.changedVideo,
+                    googleUserId : usersToPlayWith[userIndex].authData.uid,
+                    videoUrl : vidUrlsToChooseFrom[indexOfVideo]
+                };
+                console.log("\nData sent to the server: \n" + JSON.stringify(dataToSendToServer) + "\n");
+                socket.emit('send', dataToSendToServer);
 
-                    myLoop(--indexOfVideo);
-                } //else
-                    //goOffline(socket);
-            }, 5000);
-        })(vidUrlsToChooseFrom.length - 1);
-    }
+                myLoop(--indexOfVideo);
+            } //else
+                //goOffline(socket);
+        }, 5000);
+    })(vidUrlsToChooseFrom.length - 1);
 }
 
 function goOffline (socket) {
