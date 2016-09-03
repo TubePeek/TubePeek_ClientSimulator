@@ -22,16 +22,14 @@ var PossibleActions = {
     acknowledge : "acknowledge"
 };
 
-if(socket) {
-    socket.on('message', function (data) {
-        console.log("\nData gotten: " + JSON.stringify(data));
-        actOnServerMessage(data);
-    });
+socket.on('message', function (data) {
+    console.log("\nData gotten: " + JSON.stringify(data));
+    actOnServerMessage(data);
+});
 
-    socket.on('disconnect', function() {
-        console.log("Socket.io Connection with server lost!");
-    });
-}
+socket.on('disconnect', function() {
+    console.log("Socket.io Connection with server lost!");
+});
 
 // Here you can use the details of your own friends
 var usersToPlayWith = [
